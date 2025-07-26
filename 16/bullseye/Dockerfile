@@ -5,6 +5,7 @@
 #
 
 FROM debian:bullseye-slim
+# [ 1/14] FROM docker.io/library/debian:bullseye-slim@sha256:c2c58af6e3ceeb3ed40adba85d24cfa62b7432091597ada9b76b56a51b62f4c6
 
 # explicitly set user/group IDs
 RUN set -eux; \
@@ -14,6 +15,11 @@ RUN set -eux; \
 # also create the postgres user's home directory with appropriate permissions
 # see https://github.com/docker-library/postgres/issues/274
 	install --verbose --directory --owner postgres --group postgres --mode 1777 /var/lib/postgresql
+# [ 2/14] RUN
+# set -eux;
+# groupadd -r postgres --gid=999;
+# useradd -r -g postgres --uid=999 --home-dir=/var/lib/postgresql --shell=/bin/bash postgres;
+# install --verbose --directory --owner postgres --group postgres --mode 1777 /var/lib/postgresql
 
 RUN set -ex; \
 	apt-get update; \
@@ -25,6 +31,11 @@ RUN set -ex; \
 		less \
 	; \
 	rm -rf /var/lib/apt/lists/*
+# [ 3/14] RUN
+# set -ex;
+# apt-get update;
+# apt-get install -y --no-install-recommends gnupg less;
+# rm -rf /var/lib/apt/lists/*
 
 # grab gosu for easy step-down from root
 # https://github.com/tianon/gosu/releases
@@ -48,6 +59,26 @@ RUN set -eux; \
 	chmod +x /usr/local/bin/gosu; \
 	gosu --version; \
 	gosu nobody true
+# [ 4/14] RUN
+# set -eux;
+# savedAptMark="$(apt-mark showmanual)";
+# apt-get update;
+# apt-get install -y --no-install-recommends ca-certificates wget;
+# rm -rf /var/lib/apt/lists/*;
+# dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')";
+# wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/1.17/gosu-$dpkgArch";
+# wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/1.17/gosu-$dpkgArch.asc";
+# export GNUPGHOME="$(mktemp -d)";
+# gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4;
+# gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu;
+# gpgconf --kill all;
+# rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc;
+# apt-mark auto '.*' > /dev/null;
+# [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null;
+# apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false;
+# chmod +x /usr/local/bin/gosu;
+# gosu --version;
+# gosu nobody true
 
 # make the "en_US.UTF-8" locale so postgres will be utf-8 enabled by default
 RUN set -eux; \
@@ -61,6 +92,20 @@ RUN set -eux; \
 	echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen; \
 	locale-gen; \
 	locale -a | grep 'en_US.utf8'
+# [ 5/14] RUN
+# set -eux;
+# if [ -f /etc/dpkg/dpkg.cfg.d/docker ]; then
+#     grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker;
+#     sed -ri '/\/usr\/share\/locale/d' /etc/dpkg/dpkg.cfg.d/docker;
+#     ! grep -q '/usr/share/locale' /etc/dpkg/dpkg.cfg.d/docker;
+# fi;
+# apt-get update;
+# apt-get install -y --no-install-recommends locales;
+# rm -rf /var/lib/apt/lists/*;
+# echo 'en_US.UTF-8 UTF-8' >> /etc/locale.gen;
+# locale-gen;
+# locale -a | grep 'en_US.utf8'
+
 ENV LANG en_US.utf8
 
 RUN set -eux; \
@@ -71,8 +116,14 @@ RUN set -eux; \
 		zstd \
 	; \
 	rm -rf /var/lib/apt/lists/*
+# [ 6/14] RUN
+# set -eux;
+# apt-get update;
+# apt-get install -y --no-install-recommends libnss-wrapper xz-utils zstd;
+# rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /docker-entrypoint-initdb.d
+# [ 7/14] RUN mkdir /docker-entrypoint-initdb.d
 
 RUN set -ex; \
 # pub   4096R/ACCC4CF8 2011-10-13 [expires: 2019-07-02]
@@ -85,6 +136,15 @@ RUN set -ex; \
 	gpg --batch --export --armor "$key" > /usr/local/share/keyrings/postgres.gpg.asc; \
 	gpgconf --kill all; \
 	rm -rf "$GNUPGHOME"
+# [ 8/14] RUN
+# set -ex;
+# key='B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8';
+# export GNUPGHOME="$(mktemp -d)";
+# mkdir -p /usr/local/share/keyrings/;
+# gpg --batch --keyserver keyserver.ubuntu.com --recv-keys "$key";
+# gpg --batch --export --armor "$key" > /usr/local/share/keyrings/postgres.gpg.asc;
+# gpgconf --kill all;
+# rm -rf "$GNUPGHOME"
 
 ENV PG_MAJOR 16
 ENV PATH $PATH:/usr/lib/postgresql/$PG_MAJOR/bin
@@ -170,6 +230,54 @@ RUN set -ex; \
 	find /usr -name '*.pyc' -type f -exec bash -c 'for pyc; do dpkg -S "$pyc" &> /dev/null || rm -vf "$pyc"; done' -- '{}' +; \
 	\
 	postgres --version
+# [ 9/14] RUN
+# set -ex;
+# export PYTHONDONTWRITEBYTECODE=1;
+# dpkgArch="$(dpkg --print-architecture)";
+# aptRepo="[ signed-by=/usr/local/share/keyrings/postgres.gpg.asc ] http://apt.postgresql.org/pub/repos/apt/ bullseye-pgdg main 16";
+# case "$dpkgArch" in
+#     amd64 | arm64 | ppc64el)
+#         echo "deb $aptRepo" > /etc/apt/sources.list.d/pgdg.list;
+#         apt-get update;
+#         ;;
+#     *)
+#         echo "deb-src $aptRepo" > /etc/apt/sources.list.d/pgdg.list;
+#         savedAptMark="$(apt-mark showmanual)";
+#         tempDir="$(mktemp -d)";
+#         cd "$tempDir";
+#         apt-get update;
+#         apt-get install -y --no-install-recommends dpkg-dev;
+#         echo "deb [ trusted=yes ] file://$tempDir ./" > /etc/apt/sources.list.d/temp.list;
+#         _update_repo() {
+#             dpkg-scanpackages . > Packages;
+#             apt-get -o Acquire::GzipIndexes=false update;
+#         };
+#         _update_repo;
+#         nproc="$(nproc)";
+#         export DEB_BUILD_OPTIONS="nocheck parallel=$nproc";
+#         apt-get build-dep -y postgresql-common-dev;
+#         apt-get source --compile postgresql-common-dev;
+#         _update_repo;
+#         apt-get build-dep -y "postgresql-16=16.9-1.pgdg110+1";
+#         apt-get source --compile "postgresql-16=16.9-1.pgdg110+1";
+#         apt-mark showmanual | xargs apt-mark auto > /dev/null;
+#         apt-mark manual $savedAptMark;
+#         ls -lAFh;
+#         _update_repo;
+#         grep '^Package: ' Packages;
+#         cd /;
+#         ;;
+# esac;
+# apt-get install -y --no-install-recommends postgresql-common;
+# sed -ri 's/#(create_main_cluster) .*$/\1 = false/' /etc/postgresql-common/createcluster.conf;
+# apt-get install -y --no-install-recommends "postgresql-16=16.9-1.pgdg110+1";
+# rm -rf /var/lib/apt/lists/*;
+# if [ -n "$tempDir" ]; then
+#     apt-get purge -y --auto-remove;
+#     rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list;
+# fi;
+# find /usr -name '*.pyc' -type f -exec bash -c 'for pyc; do dpkg -S "$pyc" &> /dev/null || rm -vf "$pyc"; done' -- '{}' +;
+# postgres --version
 
 # make the sample config easier to munge (and "correct by default")
 RUN set -eux; \
@@ -178,16 +286,30 @@ RUN set -eux; \
 	ln -sv ../postgresql.conf.sample "/usr/share/postgresql/$PG_MAJOR/"; \
 	sed -ri "s!^#?(listen_addresses)\s*=\s*\S+.*!\1 = '*'!" /usr/share/postgresql/postgresql.conf.sample; \
 	grep -F "listen_addresses = '*'" /usr/share/postgresql/postgresql.conf.sample
+# [10/14] RUN
+# set -eux;
+# dpkg-divert --add --rename --divert "/usr/share/postgresql/postgresql.conf.sample.dpkg" "/usr/share/postgresql/16/postgresql.conf.sample";
+# cp -v /usr/share/postgresql/postgresql.conf.sample.dpkg /usr/share/postgresql/postgresql.conf.sample;
+# ln -sv ../postgresql.conf.sample "/usr/share/postgresql/16/";
+# sed -ri "s!^#?(listen_addresses)\s*=\s*\S+.*!\1 = '*'!" /usr/share/postgresql/postgresql.conf.sample;
+# grep -F "listen_addresses = '*'" /usr/share/postgresql/postgresql.conf.sample
 
 RUN install --verbose --directory --owner postgres --group postgres --mode 3777 /var/run/postgresql
+# [11/14] RUN install --verbose --directory --owner postgres --group postgres --mode 3777 /var/run/postgresql
 
 ENV PGDATA /var/lib/postgresql/data
 # this 1777 will be replaced by 0700 at runtime (allows semi-arbitrary "--user" values)
 RUN install --verbose --directory --owner postgres --group postgres --mode 1777 "$PGDATA"
+# [12/14] RUN install --verbose --directory --owner postgres --group postgres --mode 1777 "/var/lib/postgresql/data"
+
 VOLUME /var/lib/postgresql/data
 
 COPY docker-entrypoint.sh docker-ensure-initdb.sh /usr/local/bin/
+# [13/14] COPY docker-entrypoint.sh docker-ensure-initdb.sh /usr/local/bin/
+
 RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
+# [14/14] RUN ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 
 # We set the default STOPSIGNAL to SIGINT, which corresponds to what PostgreSQL
