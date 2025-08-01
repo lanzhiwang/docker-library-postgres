@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -Eeo pipefail
-# set -x
+set -x
 
 # TODO swap to -Eeuo pipefail above (after handling all potentially-unset variables)
 ################################################################################################
@@ -177,13 +177,18 @@ docker_create_db_directories() {
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 0
 	printf '%s\n' "---------------------"
 
 	local user
 	user="$(id -u)"
 	echo "user=${user}"
+	# user=0
+	# user=999
 
 	mkdir -p "$PGDATA"
+	# mkdir -p PGDATA=/var/lib/postgresql/data
+
 	# ignore failure since there are cases where we can't chmod (and PostgreSQL might fail later anyhow - it's picky about permissions of this directory)
 	chmod 00700 "$PGDATA" || :
 
@@ -218,6 +223,7 @@ docker_init_database_dir() {
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 0
 	printf '%s\n' "---------------------"
 
 	# "initdb" is particular about the current user existing in "/etc/passwd", so we use "nss_wrapper" to fake that if necessary
@@ -225,6 +231,8 @@ docker_init_database_dir() {
 	local uid
 	uid="$(id -u)"
 	echo "uid=${uid}"
+	# uid=999
+
 	if ! getent passwd "$uid" &>/dev/null; then
 		# see if we can find a suitable "libnss_wrapper.so" (https://salsa.debian.org/sssd-team/nss-wrapper/-/commit/b9925a653a54e24d09d9b498a2d913729f7abb15)
 		local wrapper
@@ -273,8 +281,10 @@ docker_verify_minimum_env() {
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 0
 	printf '%s\n' "---------------------"
 
+	# PG_MAJOR=16
 	case "${PG_MAJOR:-}" in
 	13) # https://github.com/postgres/postgres/commit/67a472d71c98c3d2fa322a1b4013080b20720b98
 		# check password first so we can output the warning before postgres
@@ -293,6 +303,8 @@ docker_verify_minimum_env() {
 		fi
 		;;
 	esac
+
+	# POSTGRES_PASSWORD=mysecretpassword
 	if [ -z "$POSTGRES_PASSWORD" ] && [ 'trust' != "$POSTGRES_HOST_AUTH_METHOD" ]; then
 		# The - option suppresses leading tabs but *not* spaces. :)
 		cat >&2 <<-'EOE'
@@ -334,6 +346,7 @@ docker_error_old_databases() {
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 0
 	printf '%s\n' "---------------------"
 
 	if [ -n "${OLD_DATABASES[0]:-}" ]; then
@@ -365,9 +378,11 @@ docker_process_init_files() {
 	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
 	for ((argnum = 1; argnum <= $#; argnum++)); do
 		echo "${!argnum}"
+		# /docker-entrypoint-initdb.d/*
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 1
 	printf '%s\n' "---------------------"
 
 	# psql here for backwards compatibility "${psql[@]}"
@@ -377,6 +392,7 @@ docker_process_init_files() {
 	local f
 	for f; do
 		echo "f=${f}"
+		# f=/docker-entrypoint-initdb.d/*
 		case "$f" in
 		*.sh)
 			# https://github.com/docker-library/postgres/issues/450#issuecomment-393167936
@@ -449,6 +465,7 @@ docker_setup_db() {
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 0
 	printf '%s\n' "---------------------"
 
 	local dbAlreadyExists
@@ -501,6 +518,7 @@ docker_setup_env() {
 		done
 	fi
 	echo "DATABASE_ALREADY_EXISTS=${DATABASE_ALREADY_EXISTS}"
+	# DATABASE_ALREADY_EXISTS=
 	for i in "${!OLD_DATABASES[@]}"; do
 		printf '%s\n' "${OLD_DATABASES[i]}"
 	done
@@ -513,9 +531,11 @@ pg_setup_hba_conf() {
 	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
 	for ((argnum = 1; argnum <= $#; argnum++)); do
 		echo "${!argnum}"
+		# postgres
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 1
 	printf '%s\n' "---------------------"
 
 	# default authentication method is md5 on versions before 14
@@ -527,6 +547,8 @@ pg_setup_hba_conf() {
 	# check the default/configured encryption and use that as the auth method
 	auth="$(postgres -C password_encryption "$@")"
 	echo "auth=${auth}"
+	# auth=scram-sha-256
+
 	: "${POSTGRES_HOST_AUTH_METHOD:=$auth}"
 	{
 		printf '\n'
@@ -544,9 +566,11 @@ docker_temp_server_start() {
 	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
 	for ((argnum = 1; argnum <= $#; argnum++)); do
 		echo "${!argnum}"
+		# postgres
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 1
 	printf '%s\n' "---------------------"
 
 	if [ "$1" = 'postgres' ]; then
@@ -574,6 +598,7 @@ docker_temp_server_stop() {
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 0
 	printf '%s\n' "---------------------"
 
 	PGUSER="${PGUSER:-postgres}" \
@@ -651,6 +676,22 @@ _main() {
 			export PGPASSWORD="${PGPASSWORD:-$POSTGRES_PASSWORD}"
 			printf '%s\n' "---------------------"
 			env
+			# HOSTNAME=5d529f4751aa
+			# POSTGRES_PASSWORD=mysecretpassword
+			# PGPASSWORD=mysecretpassword
+			# PWD=/
+			# HOME=/var/lib/postgresql
+			# LANG=en_US.utf8
+			# GOSU_VERSION=1.17
+			# POSTGRES_INITDB_ARGS=
+			# PG_MAJOR=16
+			# PG_VERSION=16.9-1.pgdg110+1
+			# SHLVL=1
+			# POSTGRES_USER=postgres
+			# PGDATA=/var/lib/postgresql/data
+			# PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+			# POSTGRES_DB=postgres
+			# _=/usr/bin/env
 			printf '%s\n' "---------------------"
 			docker_temp_server_start "$@"
 
