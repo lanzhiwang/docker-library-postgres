@@ -3,7 +3,108 @@ set -Eeo pipefail
 # set -x
 
 # TODO swap to -Eeuo pipefail above (after handling all potentially-unset variables)
-
+################################################################################################
+# --------------------- file_env ---------------------
+# POSTGRES_PASSWORD
+# ---------------------
+# 1
+# ---------------------
+# var=POSTGRES_PASSWORD
+# fileVar=POSTGRES_PASSWORD_FILE
+# def=
+# val=
+# ---------------------
+# HOSTNAME=77569243771b
+# POSTGRES_PASSWORD=mysecretpassword
+# PWD=/
+# HOME=/root
+# LANG=en_US.utf8
+# GOSU_VERSION=1.17
+# PG_MAJOR=16
+# PG_VERSION=16.9-1.pgdg110+1
+# SHLVL=1
+# PGDATA=/var/lib/postgresql/data
+# PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+# _=/usr/bin/env
+# ---------------------
+# --------------------- file_env ---------------------
+# POSTGRES_USER
+# postgres
+# ---------------------
+# 2
+# ---------------------
+# var=POSTGRES_USER
+# fileVar=POSTGRES_USER_FILE
+# def=postgres
+# val=postgres
+# ---------------------
+# HOSTNAME=77569243771b
+# POSTGRES_PASSWORD=mysecretpassword
+# PWD=/
+# HOME=/root
+# LANG=en_US.utf8
+# GOSU_VERSION=1.17
+# PG_MAJOR=16
+# PG_VERSION=16.9-1.pgdg110+1
+# SHLVL=1
+# POSTGRES_USER=postgres
+# PGDATA=/var/lib/postgresql/data
+# PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+# _=/usr/bin/env
+# ---------------------
+# --------------------- file_env ---------------------
+# POSTGRES_DB
+# postgres
+# ---------------------
+# 2
+# ---------------------
+# var=POSTGRES_DB
+# fileVar=POSTGRES_DB_FILE
+# def=postgres
+# val=postgres
+# ---------------------
+# HOSTNAME=77569243771b
+# POSTGRES_PASSWORD=mysecretpassword
+# PWD=/
+# HOME=/root
+# LANG=en_US.utf8
+# GOSU_VERSION=1.17
+# PG_MAJOR=16
+# PG_VERSION=16.9-1.pgdg110+1
+# SHLVL=1
+# POSTGRES_USER=postgres
+# PGDATA=/var/lib/postgresql/data
+# PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+# POSTGRES_DB=postgres
+# _=/usr/bin/env
+# ---------------------
+# --------------------- file_env ---------------------
+# POSTGRES_INITDB_ARGS
+# ---------------------
+# 1
+# ---------------------
+# var=POSTGRES_INITDB_ARGS
+# fileVar=POSTGRES_INITDB_ARGS_FILE
+# def=
+# val=
+# ---------------------
+# HOSTNAME=77569243771b
+# POSTGRES_PASSWORD=mysecretpassword
+# PWD=/
+# HOME=/root
+# LANG=en_US.utf8
+# GOSU_VERSION=1.17
+# POSTGRES_INITDB_ARGS=
+# PG_MAJOR=16
+# PG_VERSION=16.9-1.pgdg110+1
+# SHLVL=1
+# POSTGRES_USER=postgres
+# PGDATA=/var/lib/postgresql/data
+# PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+# POSTGRES_DB=postgres
+# _=/usr/bin/env
+# ---------------------
+################################################################################################
 # usage: file_env VAR [DEFAULT]
 #    ie: file_env 'XYZ_DB_PASSWORD' 'example'
 # (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
@@ -51,10 +152,13 @@ _is_sourced() {
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 0
 	printf '%s\n' "---------------------"
 
 	for i in "${!FUNCNAME[@]}"; do
 		printf '%s\n' "${FUNCNAME[i]}"
+		# _is_sourced
+		# main
 	done
 
 	printf '%s\n' "---------------------"
@@ -371,6 +475,7 @@ docker_setup_env() {
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 0
 	printf '%s\n' "---------------------"
 
 	file_env 'POSTGRES_PASSWORD'
@@ -395,6 +500,11 @@ docker_setup_env() {
 			fi
 		done
 	fi
+	echo "DATABASE_ALREADY_EXISTS=${DATABASE_ALREADY_EXISTS}"
+	for i in "${!OLD_DATABASES[@]}"; do
+		printf '%s\n' "${OLD_DATABASES[i]}"
+	done
+
 }
 
 # append POSTGRES_HOST_AUTH_METHOD to pg_hba.conf for "host" connections
@@ -476,14 +586,17 @@ _pg_want_help() {
 	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
 	for ((argnum = 1; argnum <= $#; argnum++)); do
 		echo "${!argnum}"
+		# postgres
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 1
 	printf '%s\n' "---------------------"
 
 	local arg
 	for arg; do
 		echo "arg=${arg}"
+		# arg=postgres
 		case "$arg" in
 		# postgres --help | grep 'then exit'
 		# leaving out -C on purpose since it always fails and is unhelpful:
@@ -500,12 +613,15 @@ _main() {
 	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
 	for ((argnum = 1; argnum <= $#; argnum++)); do
 		echo "${!argnum}"
+		# postgres
 	done
 	printf '%s\n' "---------------------"
 	printf '%s\n' "$#"
+	# 1
 	printf '%s\n' "---------------------"
 
 	# if first arg looks like a flag, assume we want to run postgres server
+	# if [ p = '-' ]
 	if [ "${1:0:1}" = '-' ]; then
 		set -- postgres "$@"
 	fi
@@ -563,14 +679,29 @@ _main() {
 
 printf '%s\n' "---------------------"
 env
+# HOSTNAME=77569243771b
+# POSTGRES_PASSWORD=mysecretpassword
+# PWD=/
+# HOME=/root
+# LANG=en_US.utf8
+# GOSU_VERSION=1.17
+# PG_MAJOR=16
+# PG_VERSION=16.9-1.pgdg110+1
+# SHLVL=1
+# PGDATA=/var/lib/postgresql/data
+# PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+# _=/usr/bin/env
 printf '%s\n' "---------------------"
 for word in "$@"; do
 	printf '%s\n' "$word"
+	# postgres
 done
 printf '%s\n' "---------------------"
 printf '%s\n' "$0"
+# /usr/local/bin/docker-entrypoint.sh
 printf '%s\n' "---------------------"
 printf '%s\n' "$#"
+# 1
 printf '%s\n' "---------------------"
 
 if ! _is_sourced; then
