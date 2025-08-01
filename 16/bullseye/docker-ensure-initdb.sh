@@ -37,7 +37,7 @@ if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
 	docker_error_old_databases
 
 	# check dir permissions to reduce likelihood of half-initialized database
-	ls /docker-entrypoint-initdb.d/ > /dev/null
+	ls /docker-entrypoint-initdb.d/ >/dev/null
 
 	docker_init_database_dir
 	pg_setup_hba_conf "$@"
@@ -55,19 +55,19 @@ if [ -z "$DATABASE_ALREADY_EXISTS" ]; then
 else
 	self="$(basename "$0")"
 	case "$self" in
-		docker-ensure-initdb.sh)
-			echo >&2 "$self: note: database already initialized in '$PGDATA'!"
-			exit 0
-			;;
+	docker-ensure-initdb.sh)
+		echo >&2 "$self: note: database already initialized in '$PGDATA'!"
+		exit 0
+		;;
 
-		docker-enforce-initdb.sh)
-			echo >&2 "$self: error: (unexpected) database found in '$PGDATA'!"
-			exit 1
-			;;
+	docker-enforce-initdb.sh)
+		echo >&2 "$self: error: (unexpected) database found in '$PGDATA'!"
+		exit 1
+		;;
 
-		*)
-			echo >&2 "$self: error: unknown file name: $self"
-			exit 99
-			;;
+	*)
+		echo >&2 "$self: error: unknown file name: $self"
+		exit 99
+		;;
 	esac
 fi

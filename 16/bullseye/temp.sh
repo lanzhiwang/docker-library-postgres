@@ -42,12 +42,6 @@ _is_sourced() {
 	printf '%s\n' "$#"
 	printf '%s\n' "---------------------"
 
-	for i in "${!FUNCNAME[@]}"; do
-		printf '%s\n' "${FUNCNAME[i]}"
-	done
-
-	printf '%s\n' "---------------------"
-
 	# https://unix.stackexchange.com/a/215279
 	[ "${#FUNCNAME[@]}" -ge 2 ] &&
 		[ "${FUNCNAME[0]}" = '_is_sourced' ] &&
