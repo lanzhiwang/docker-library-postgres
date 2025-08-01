@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -Eeo pipefail
-set -x
+# set -x
 
 # TODO swap to -Eeuo pipefail above (after handling all potentially-unset variables)
 
