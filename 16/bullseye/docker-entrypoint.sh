@@ -110,27 +110,27 @@ set -x
 # (will allow for "$XYZ_DB_PASSWORD_FILE" to fill in the value of
 #  "$XYZ_DB_PASSWORD" from a file, especially for Docker's secrets feature)
 file_env() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# printf '%s\n' "---------------------"
 
 	local var="$1"
 	local fileVar="${var}_FILE"
 	local def="${2:-}"
-	echo "var=${var}"
-	echo "fileVar=${fileVar}"
-	echo "def=${def}"
+	# echo "var=${var}"
+	# echo "fileVar=${fileVar}"
+	# echo "def=${def}"
 
 	if [ "${!var:-}" ] && [ "${!fileVar:-}" ]; then
 		printf >&2 'error: both %s and %s are set (but are exclusive)\n' "$var" "$fileVar"
 		exit 1
 	fi
 	local val="$def"
-	echo "val=${val}"
+	# echo "val=${val}"
 
 	if [ "${!var:-}" ]; then
 		val="${!var}"
@@ -138,30 +138,30 @@ file_env() {
 		val="$(<"${!fileVar}")"
 	fi
 	export "$var"="$val"
-	printf '%s\n' "---------------------"
-	env
-	printf '%s\n' "---------------------"
+	# printf '%s\n' "---------------------"
+	# env
+	# printf '%s\n' "---------------------"
 	unset "$fileVar"
 }
 
 # check to see if this file is being run or sourced from another script
 _is_sourced() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 0
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 0
+	# printf '%s\n' "---------------------"
 
-	for i in "${!FUNCNAME[@]}"; do
-		printf '%s\n' "${FUNCNAME[i]}"
-		# _is_sourced
-		# main
-	done
+	# for i in "${!FUNCNAME[@]}"; do
+	# 	printf '%s\n' "${FUNCNAME[i]}"
+	# 	# _is_sourced
+	# 	# main
+	# done
 
-	printf '%s\n' "---------------------"
+	# printf '%s\n' "---------------------"
 
 	# https://unix.stackexchange.com/a/215279
 	[ "${#FUNCNAME[@]}" -ge 2 ] &&
@@ -171,18 +171,18 @@ _is_sourced() {
 
 # used to create initial postgres directories and if run as root, ensure ownership to the "postgres" user
 docker_create_db_directories() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 0
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 0
+	# printf '%s\n' "---------------------"
 
 	local user
 	user="$(id -u)"
-	echo "user=${user}"
+	# echo "user=${user}"
 	# user=0
 	# user=999
 
@@ -217,27 +217,27 @@ docker_create_db_directories() {
 # `initdb` automatically creates the "postgres", "template0", and "template1" dbnames
 # this is also where the database user is created, specified by `POSTGRES_USER` env
 docker_init_database_dir() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 0
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 0
+	# printf '%s\n' "---------------------"
 
 	# "initdb" is particular about the current user existing in "/etc/passwd", so we use "nss_wrapper" to fake that if necessary
 	# see https://github.com/docker-library/postgres/pull/253, https://github.com/docker-library/postgres/issues/359, https://cwrap.org/nss_wrapper.html
 	local uid
 	uid="$(id -u)"
-	echo "uid=${uid}"
+	# echo "uid=${uid}"
 	# uid=999
 
 	if ! getent passwd "$uid" &>/dev/null; then
 		# see if we can find a suitable "libnss_wrapper.so" (https://salsa.debian.org/sssd-team/nss-wrapper/-/commit/b9925a653a54e24d09d9b498a2d913729f7abb15)
 		local wrapper
 		for wrapper in {/usr,}/lib{/*,}/libnss_wrapper.so; do
-			echo "wrapper=${wrapper}"
+			# echo "wrapper=${wrapper}"
 			if [ -s "$wrapper" ]; then
 				NSS_WRAPPER_PASSWD="$(mktemp)"
 				NSS_WRAPPER_GROUP="$(mktemp)"
@@ -275,14 +275,14 @@ docker_init_database_dir() {
 # print large warning if POSTGRES_HOST_AUTH_METHOD is set to 'trust'
 # assumes database is not set up, ie: [ -z "$DATABASE_ALREADY_EXISTS" ]
 docker_verify_minimum_env() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 0
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 0
+	# printf '%s\n' "---------------------"
 
 	# PG_MAJOR=16
 	case "${PG_MAJOR:-}" in
@@ -340,14 +340,14 @@ docker_verify_minimum_env() {
 }
 # similar to the above, but errors if there are any "old" databases detected (usually due to upgrades without pg_upgrade)
 docker_error_old_databases() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 0
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 0
+	# printf '%s\n' "---------------------"
 
 	if [ -n "${OLD_DATABASES[0]:-}" ]; then
 		cat >&2 <<-EOE
@@ -375,15 +375,15 @@ docker_error_old_databases() {
 #    ie: docker_process_init_files /always-initdb.d/*
 # process initializer files, based on file extensions and permissions
 docker_process_init_files() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-		# /docker-entrypoint-initdb.d/*
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 1
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# 	# /docker-entrypoint-initdb.d/*
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 1
+	# printf '%s\n' "---------------------"
 
 	# psql here for backwards compatibility "${psql[@]}"
 	psql=(docker_process_sql)
@@ -391,7 +391,7 @@ docker_process_init_files() {
 	printf '\n'
 	local f
 	for f; do
-		echo "f=${f}"
+		# echo "f=${f}"
 		# f=/docker-entrypoint-initdb.d/*
 		case "$f" in
 		*.sh)
@@ -437,13 +437,19 @@ docker_process_init_files() {
 #    ie: docker_process_sql -f my-file.sql
 #    ie: docker_process_sql <my-file.sql
 docker_process_sql() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# 	# --dbname
+	# 	# postgres
+	# 	# --set
+	# 	# db=postgres
+	# 	# --tuples-only
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 5
+	# printf '%s\n' "---------------------"
 
 	local query_runner=(psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --no-password --no-psqlrc)
 	echo "query_runner=${query_runner}"
@@ -459,14 +465,14 @@ docker_process_sql() {
 # create initial database
 # uses environment variables for input: POSTGRES_DB
 docker_setup_db() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 0
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 0
+	# printf '%s\n' "---------------------"
 
 	local dbAlreadyExists
 	dbAlreadyExists="$(
@@ -486,14 +492,14 @@ docker_setup_db() {
 # Loads various settings that are used elsewhere in the script
 # This should be called before any other functions
 docker_setup_env() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 0
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 0
+	# printf '%s\n' "---------------------"
 
 	file_env 'POSTGRES_PASSWORD'
 
@@ -517,26 +523,26 @@ docker_setup_env() {
 			fi
 		done
 	fi
-	echo "DATABASE_ALREADY_EXISTS=${DATABASE_ALREADY_EXISTS}"
-	# DATABASE_ALREADY_EXISTS=
-	for i in "${!OLD_DATABASES[@]}"; do
-		printf '%s\n' "${OLD_DATABASES[i]}"
-	done
+	# echo "DATABASE_ALREADY_EXISTS=${DATABASE_ALREADY_EXISTS}"
+	# # DATABASE_ALREADY_EXISTS=
+	# for i in "${!OLD_DATABASES[@]}"; do
+	# 	printf '%s\n' "${OLD_DATABASES[i]}"
+	# done
 
 }
 
 # append POSTGRES_HOST_AUTH_METHOD to pg_hba.conf for "host" connections
 # all arguments will be passed along as arguments to `postgres` for getting the value of 'password_encryption'
 pg_setup_hba_conf() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-		# postgres
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 1
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# 	# postgres
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 1
+	# printf '%s\n' "---------------------"
 
 	# default authentication method is md5 on versions before 14
 	# https://www.postgresql.org/about/news/postgresql-14-released-2318/
@@ -563,15 +569,15 @@ pg_setup_hba_conf() {
 # start socket-only postgresql server for setting up or running scripts
 # all arguments will be passed along as arguments to `postgres` (via pg_ctl)
 docker_temp_server_start() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-		# postgres
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 1
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# 	# postgres
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 1
+	# printf '%s\n' "---------------------"
 
 	if [ "$1" = 'postgres' ]; then
 		shift
@@ -592,14 +598,14 @@ docker_temp_server_start() {
 
 # stop postgresql server after done setting up user and running scripts
 docker_temp_server_stop() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 0
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 0
+	# printf '%s\n' "---------------------"
 
 	PGUSER="${PGUSER:-postgres}" \
 		pg_ctl -D "$PGDATA" -m fast -w stop
@@ -608,19 +614,19 @@ docker_temp_server_stop() {
 # check arguments for an option that would cause postgres to stop
 # return true if there is one
 _pg_want_help() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-		# postgres
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 1
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# 	# postgres
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 1
+	# printf '%s\n' "---------------------"
 
 	local arg
 	for arg; do
-		echo "arg=${arg}"
+		# echo "arg=${arg}"
 		# arg=postgres
 		case "$arg" in
 		# postgres --help | grep 'then exit'
@@ -635,15 +641,15 @@ _pg_want_help() {
 }
 
 _main() {
-	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
-	for ((argnum = 1; argnum <= $#; argnum++)); do
-		echo "${!argnum}"
-		# postgres
-	done
-	printf '%s\n' "---------------------"
-	printf '%s\n' "$#"
-	# 1
-	printf '%s\n' "---------------------"
+	# printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
+	# for ((argnum = 1; argnum <= $#; argnum++)); do
+	# 	echo "${!argnum}"
+	# 	# postgres
+	# done
+	# printf '%s\n' "---------------------"
+	# printf '%s\n' "$#"
+	# # 1
+	# printf '%s\n' "---------------------"
 
 	# if first arg looks like a flag, assume we want to run postgres server
 	# if [ p = '-' ]
@@ -674,25 +680,25 @@ _main() {
 			# PGPASSWORD is required for psql when authentication is required for 'local' connections via pg_hba.conf and is otherwise harmless
 			# e.g. when '--auth=md5' or '--auth-local=md5' is used in POSTGRES_INITDB_ARGS
 			export PGPASSWORD="${PGPASSWORD:-$POSTGRES_PASSWORD}"
-			printf '%s\n' "---------------------"
-			env
-			# HOSTNAME=5d529f4751aa
-			# POSTGRES_PASSWORD=mysecretpassword
-			# PGPASSWORD=mysecretpassword
-			# PWD=/
-			# HOME=/var/lib/postgresql
-			# LANG=en_US.utf8
-			# GOSU_VERSION=1.17
-			# POSTGRES_INITDB_ARGS=
-			# PG_MAJOR=16
-			# PG_VERSION=16.9-1.pgdg110+1
-			# SHLVL=1
-			# POSTGRES_USER=postgres
-			# PGDATA=/var/lib/postgresql/data
-			# PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
-			# POSTGRES_DB=postgres
-			# _=/usr/bin/env
-			printf '%s\n' "---------------------"
+			# printf '%s\n' "---------------------"
+			# env
+			# # HOSTNAME=5d529f4751aa
+			# # POSTGRES_PASSWORD=mysecretpassword
+			# # PGPASSWORD=mysecretpassword
+			# # PWD=/
+			# # HOME=/var/lib/postgresql
+			# # LANG=en_US.utf8
+			# # GOSU_VERSION=1.17
+			# # POSTGRES_INITDB_ARGS=
+			# # PG_MAJOR=16
+			# # PG_VERSION=16.9-1.pgdg110+1
+			# # SHLVL=1
+			# # POSTGRES_USER=postgres
+			# # PGDATA=/var/lib/postgresql/data
+			# # PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+			# # POSTGRES_DB=postgres
+			# # _=/usr/bin/env
+			# printf '%s\n' "---------------------"
 			docker_temp_server_start "$@"
 
 			docker_setup_db
