@@ -1,4 +1,5 @@
 showArg() {
+	printf '%s %s %s\n' "---------------------" "${FUNCNAME}" "---------------------"
 	for ((argnum = 1; argnum <= $#; argnum++)); do
 		echo "${!argnum}"
 	done
@@ -34,3 +35,7 @@ showArg x1 x2 x3
 printf '%s\n' "---------------------"
 
 showArg "x 1" x2 x3
+
+printf '%s\n' "---------------------"
+
+printf '%s file_env %s\n' "---------------------" "---------------------"
