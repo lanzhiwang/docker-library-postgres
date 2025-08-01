@@ -3,8 +3,13 @@ $ docker pull debian:bullseye-slim
 
 $ docker run -ti --rm \
 -v ~/work/code/py_code/postgres/docker-library-postgres:/docker-library-postgres \
--w /docker-library-postgres \
 debian:bullseye-slim bash
+
+
+
+root@41eff97a5765:/# pwd
+/
+root@41eff97a5765:/#
 
 root@41eff97a5765:/#
 root@41eff97a5765:/#
@@ -669,6 +674,307 @@ postgres (PostgreSQL) 16.9 (Debian 16.9-1.pgdg110+1)
 root@41eff97a5765:/#
 
 
+root@41eff97a5765:/#
+root@41eff97a5765:/# ls -al /usr/share/postgresql/postgresql.conf.sample.dpkg
+ls: cannot access '/usr/share/postgresql/postgresql.conf.sample.dpkg': No such file or directory
+
+root@41eff97a5765:/# ls -al /usr/share/postgresql/16/postgresql.conf.sample
+-rw-r--r-- 1 root root 29756 May  6 15:55 /usr/share/postgresql/16/postgresql.conf.sample
+
+root@41eff97a5765:/# dpkg-divert --add --rename --divert "/usr/share/postgresql/postgresql.conf.sample.dpkg" "/usr/share/postgresql/16/postgresql.conf.sample"
+Adding 'local diversion of /usr/share/postgresql/16/postgresql.conf.sample to /usr/share/postgresql/postgresql.conf.sample.dpkg'
+root@41eff97a5765:/#
+root@41eff97a5765:/# ls -al /usr/share/postgresql/postgresql.conf.sample.dpkg
+-rw-r--r-- 1 root root 29756 May  6 15:55 /usr/share/postgresql/postgresql.conf.sample.dpkg
+root@41eff97a5765:/# ls -al /usr/share/postgresql/16/postgresql.conf.sample
+ls: cannot access '/usr/share/postgresql/16/postgresql.conf.sample': No such file or directory
+root@41eff97a5765:/#
+root@41eff97a5765:/# ls -al /usr/share/postgresql/postgresql.conf.sample
+ls: cannot access '/usr/share/postgresql/postgresql.conf.sample': No such file or directory
+root@41eff97a5765:/# cp -v /usr/share/postgresql/postgresql.conf.sample.dpkg /usr/share/postgresql/postgresql.conf.sample
+'/usr/share/postgresql/postgresql.conf.sample.dpkg' -> '/usr/share/postgresql/postgresql.conf.sample'
+root@41eff97a5765:/# ls -al /usr/share/postgresql/postgresql.conf.sample
+-rw-r--r-- 1 root root 29756 Aug  1 07:04 /usr/share/postgresql/postgresql.conf.sample
+root@41eff97a5765:/#
+root@41eff97a5765:/# pwd
+/
+root@41eff97a5765:/# ls -al ../postgresql.conf.sample
+ls: cannot access '../postgresql.conf.sample': No such file or directory
+root@41eff97a5765:/# ls -al /usr/share/postgresql/16/
+total 1316
+drwxr-xr-x 7 root root   4096 Aug  1 07:02 .
+drwxr-xr-x 3 root root   4096 Aug  1 07:04 ..
+-rw-r--r-- 1 root root     10 May  6 15:55 catalog_version
+drwxr-xr-x 2 root root   4096 Aug  1 07:01 contrib
+-rw-r--r-- 1 root root  33458 May  6 15:55 errcodes.txt
+drwxr-xr-x 2 root root  16384 Aug  1 07:01 extension
+-rw-r--r-- 1 root root   5765 May  6 15:55 fix-CVE-2024-4317.sql
+-rw-r--r-- 1 root root 114975 May  6 15:55 information_schema.sql
+drwxr-xr-x 4 root root   4096 Aug  1 07:01 man
+-rw-r--r-- 1 root root   5625 May  6 15:55 pg_hba.conf.sample
+-rw-r--r-- 1 root root   2640 May  6 15:55 pg_ident.conf.sample
+-rw-r--r-- 1 root root    640 May  6 15:55 pg_service.conf.sample
+-rw-r--r-- 1 root root 944104 May  6 15:55 postgres.bki
+-rw-r--r-- 1 root root    278 May  6 15:55 psqlrc.sample
+-rw-r--r-- 1 root root  44176 May  6 15:55 snowball_create.sql
+-rw-r--r-- 1 root root  35681 May  6 15:55 sql_features.txt
+-rw-r--r-- 1 root root   8895 May  6 15:55 system_constraints.sql
+-rw-r--r-- 1 root root  23315 May  6 15:55 system_functions.sql
+-rw-r--r-- 1 root root  50273 May  6 15:55 system_views.sql
+drwxr-xr-x 2 root root   4096 Aug  1 07:01 timezonesets
+drwxr-xr-x 2 root root   4096 Aug  1 07:01 tsearch_data
+root@41eff97a5765:/# ln -sv ../postgresql.conf.sample "/usr/share/postgresql/16/"
+'/usr/share/postgresql/16/postgresql.conf.sample' -> '../postgresql.conf.sample'
+root@41eff97a5765:/# ls -al /usr/share/postgresql/16/
+total 1316
+drwxr-xr-x 7 root root   4096 Aug  1 07:06 .
+drwxr-xr-x 3 root root   4096 Aug  1 07:04 ..
+-rw-r--r-- 1 root root     10 May  6 15:55 catalog_version
+drwxr-xr-x 2 root root   4096 Aug  1 07:01 contrib
+-rw-r--r-- 1 root root  33458 May  6 15:55 errcodes.txt
+drwxr-xr-x 2 root root  16384 Aug  1 07:01 extension
+-rw-r--r-- 1 root root   5765 May  6 15:55 fix-CVE-2024-4317.sql
+-rw-r--r-- 1 root root 114975 May  6 15:55 information_schema.sql
+drwxr-xr-x 4 root root   4096 Aug  1 07:01 man
+-rw-r--r-- 1 root root   5625 May  6 15:55 pg_hba.conf.sample
+-rw-r--r-- 1 root root   2640 May  6 15:55 pg_ident.conf.sample
+-rw-r--r-- 1 root root    640 May  6 15:55 pg_service.conf.sample
+-rw-r--r-- 1 root root 944104 May  6 15:55 postgres.bki
+lrwxrwxrwx 1 root root     25 Aug  1 07:06 postgresql.conf.sample -> ../postgresql.conf.sample
+-rw-r--r-- 1 root root    278 May  6 15:55 psqlrc.sample
+-rw-r--r-- 1 root root  44176 May  6 15:55 snowball_create.sql
+-rw-r--r-- 1 root root  35681 May  6 15:55 sql_features.txt
+-rw-r--r-- 1 root root   8895 May  6 15:55 system_constraints.sql
+-rw-r--r-- 1 root root  23315 May  6 15:55 system_functions.sql
+-rw-r--r-- 1 root root  50273 May  6 15:55 system_views.sql
+drwxr-xr-x 2 root root   4096 Aug  1 07:01 timezonesets
+drwxr-xr-x 2 root root   4096 Aug  1 07:01 tsearch_data
+root@41eff97a5765:/#
+root@41eff97a5765:/# sed -ri "s!^#?(listen_addresses)\s*=\s*\S+.*!\1 = '*'!" /usr/share/postgresql/postgresql.conf.sample
+bash: !\1: event not found
+root@41eff97a5765:/# grep -F "listen_addresses = '*'" /usr/share/postgresql/postgresql.conf.sample
+root@41eff97a5765:/#
+
+root@41eff97a5765:/# install --verbose --directory --owner postgres --group postgres --mode 3777 /var/run/postgresql
+root@41eff97a5765:/#
+
+root@41eff97a5765:/# export PGDATA=/var/lib/postgresql/data
+root@41eff97a5765:/# install --verbose --directory --owner postgres --group postgres --mode 1777 "/var/lib/postgresql/data"
+install: creating directory '/var/lib/postgresql/data'
+root@41eff97a5765:/#
+
+$ docker cp ~/work/code/py_code/postgres/docker-library-postgres/16/bullseye/docker-entrypoint.sh 66a11232b30b:/usr/local/bin/docker-entrypoint.sh
+Successfully copied 27.6kB to 66a11232b30b:/usr/local/bin/docker-entrypoint.sh
+
+$ docker cp ~/work/code/py_code/postgres/docker-library-postgres/16/bullseye/docker-ensure-initdb.sh 66a11232b30b:/usr/local/bin/docker-ensure-initdb.sh
+Successfully copied 4.1kB to 66a11232b30b:/usr/local/bin/docker-ensure-initdb.sh
+$
+
+root@41eff97a5765:/# ls -al /usr/local/bin/
+total 2348
+drwxr-xr-x 1 root root       4096 Aug  1 07:11 .
+drwxr-xr-x 1 root root       4096 Jul 21 00:00 ..
+-rwxr-xr-x 1  501 dialout    2311 Aug  1 02:15 docker-ensure-initdb.sh
+-rwxr-xr-x 1  501 dialout   25781 Aug  1 05:22 docker-entrypoint.sh
+-rwxr-xr-x 1 root root    2355481 Nov  2  2023 gosu
+root@41eff97a5765:/#
+
+root@41eff97a5765:/# ln -sT docker-ensure-initdb.sh /usr/local/bin/docker-enforce-initdb.sh
+root@41eff97a5765:/# ls -al /usr/local/bin/
+total 2348
+drwxr-xr-x 1 root root       4096 Aug  1 07:12 .
+drwxr-xr-x 1 root root       4096 Jul 21 00:00 ..
+lrwxrwxrwx 1 root root         23 Aug  1 07:12 docker-enforce-initdb.sh -> docker-ensure-initdb.sh
+-rwxr-xr-x 1  501 dialout    2311 Aug  1 02:15 docker-ensure-initdb.sh
+-rwxr-xr-x 1  501 dialout   25781 Aug  1 05:22 docker-entrypoint.sh
+-rwxr-xr-x 1 root root    2355481 Nov  2  2023 gosu
+root@41eff97a5765:/#
+
+
+
+
+
+
+root@60b0b099faf9:/# env
+HOSTNAME=60b0b099faf9
+GNUPGHOME=/tmp/tmp.vjITLxMcmt
+PWD=/
+HOME=/root
+LANG=en_US.utf8
+PG_MAJOR=16
+PG_VERSION=16.9-1.pgdg110+1
+TERM=xterm
+SHLVL=1
+PYTHONDONTWRITEBYTECODE=1
+PGDATA=/var/lib/postgresql/data
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+_=/usr/bin/env
+root@60b0b099faf9:/#
+
+# docker_setup_env
+root@60b0b099faf9:/# export POSTGRES_PASSWORD=mysecretpassword
+root@60b0b099faf9:/# export POSTGRES_USER=postgres
+root@60b0b099faf9:/# export POSTGRES_DB=postgres
+root@60b0b099faf9:/# export POSTGRES_INITDB_ARGS=
+root@60b0b099faf9:/#
+root@60b0b099faf9:/# echo ${POSTGRES_HOST_AUTH_METHOD}
+
+root@60b0b099faf9:/# echo ${POSTGRES_HOST_AUTH_METHOD:=}
+
+root@60b0b099faf9:/#
+root@60b0b099faf9:/# declare -g DATABASE_ALREADY_EXISTS
+root@60b0b099faf9:/# echo ${DATABASE_ALREADY_EXISTS}
+
+root@60b0b099faf9:/# declare -ag OLD_DATABASES=()
+root@60b0b099faf9:/#
+
+
+# docker_create_db_directories
+root@60b0b099faf9:/# id -u
+0
+root@60b0b099faf9:/# echo "$PGDATA"
+/var/lib/postgresql/data
+root@60b0b099faf9:/# mkdir -p "$PGDATA"
+root@60b0b099faf9:/# chmod 00700 "$PGDATA"
+root@60b0b099faf9:/# mkdir -p /var/run/postgresql
+root@60b0b099faf9:/# chmod 03775 /var/run/postgresql
+root@60b0b099faf9:/# echo ${POSTGRES_INITDB_WALDIR}
+
+root@60b0b099faf9:/# echo ${POSTGRES_INITDB_WALDIR:-}
+
+root@60b0b099faf9:/# find /var/lib/postgresql/data '!' -user postgres -exec chown postgres '{}' +
+root@60b0b099faf9:/# find /var/run/postgresql '!' -user postgres -exec chown postgres '{}' +
+root@60b0b099faf9:/#
+
+
+root@60b0b099faf9:/# su postgres
+postgres@60b0b099faf9:/$ pwd
+/
+postgres@60b0b099faf9:/$ cd /var/lib/postgresql
+postgres@60b0b099faf9:~$ pwd
+/var/lib/postgresql
+postgres@60b0b099faf9:~$ ls -al
+total 16
+drwxrwxrwt 3 postgres postgres 4096 Aug  1 08:27 .
+drwxr-xr-x 1 root     root     4096 Aug  1 08:27 ..
+drwx------ 2 postgres postgres 4096 Aug  1 08:27 data
+postgres@60b0b099faf9:~$ ls ./data/
+postgres@60b0b099faf9:~$
+postgres@60b0b099faf9:~$ env
+SHELL=/bin/bash
+HOSTNAME=60b0b099faf9
+POSTGRES_PASSWORD=mysecretpassword
+GNUPGHOME=/tmp/tmp.vjITLxMcmt
+PWD=/var/lib/postgresql
+LOGNAME=postgres
+HOME=/var/lib/postgresql
+LANG=en_US.utf8
+POSTGRES_INITDB_ARGS=
+PG_MAJOR=16
+PG_VERSION=16.9-1.pgdg110+1
+TERM=xterm
+USER=postgres
+SHLVL=2
+POSTGRES_USER=postgres
+PYTHONDONTWRITEBYTECODE=1
+PGDATA=/var/lib/postgresql/data
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/lib/postgresql/16/bin
+MAIL=/var/mail/postgres
+POSTGRES_DB=postgres
+OLDPWD=/
+_=/usr/bin/env
+postgres@60b0b099faf9:~$
+
+# docker_verify_minimum_env
+# docker_error_old_databases
+
+postgres@60b0b099faf9:~$ ls /docker-entrypoint-initdb.d/
+postgres@60b0b099faf9:~$
+
+# docker_init_database_dir
+postgres@60b0b099faf9:~$ id -u
+999
+postgres@60b0b099faf9:~$ getent passwd 999
+postgres:x:999:999::/var/lib/postgresql:/bin/bash
+postgres@60b0b099faf9:~$ echo $?
+0
+postgres@60b0b099faf9:~$ echo ${POSTGRES_INITDB_WALDIR}
+
+postgres@60b0b099faf9:~$ echo ${POSTGRES_INITDB_WALDIR:-}
+
+postgres@60b0b099faf9:~$ eval 'initdb --username="$POSTGRES_USER" --pwfile=<(printf "%s\n" "$POSTGRES_PASSWORD")  "postgres"'
+The files belonging to this database system will be owned by user "postgres".
+This user must also own the server process.
+
+The database cluster will be initialized with locale "en_US.utf8".
+The default database encoding has accordingly been set to "UTF8".
+The default text search configuration will be set to "english".
+
+Data page checksums are disabled.
+
+creating directory postgres ... ok
+creating subdirectories ... ok
+selecting dynamic shared memory implementation ... posix
+selecting default max_connections ... 100
+selecting default shared_buffers ... 128MB
+selecting default time zone ... Etc/UTC
+creating configuration files ... ok
+running bootstrap script ... ok
+performing post-bootstrap initialization ... ok
+syncing data to disk ... ok
+
+initdb: warning: enabling "trust" authentication for local connections
+initdb: hint: You can change this by editing pg_hba.conf or using the option -A, or --auth-local and --auth-host, the next time you run initdb.
+
+Success. You can now start the database server using:
+
+    pg_ctl -D postgres -l logfile start
+
+postgres@60b0b099faf9:~$
+postgres@60b0b099faf9:~$ echo ${LD_PRELOAD}
+
+postgres@60b0b099faf9:~$ echo ${LD_PRELOAD:-}
+
+postgres@60b0b099faf9:~$
+postgres@60b0b099faf9:~$ ls -al
+total 20
+drwxrwxrwt  4 postgres postgres 4096 Aug  1 08:40 .
+drwxr-xr-x  1 root     root     4096 Aug  1 08:27 ..
+drwx------  2 postgres postgres 4096 Aug  1 08:27 data
+drwx------ 19 postgres postgres 4096 Aug  1 08:40 postgres
+postgres@60b0b099faf9:~$ ls -al data/
+total 8
+drwx------ 2 postgres postgres 4096 Aug  1 08:27 .
+drwxrwxrwt 4 postgres postgres 4096 Aug  1 08:40 ..
+postgres@60b0b099faf9:~$ ls -al postgres/
+total 128
+drwx------ 19 postgres postgres  4096 Aug  1 08:40 .
+drwxrwxrwt  4 postgres postgres  4096 Aug  1 08:40 ..
+drwx------  5 postgres postgres  4096 Aug  1 08:40 base
+drwx------  2 postgres postgres  4096 Aug  1 08:40 global
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_commit_ts
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_dynshmem
+-rw-------  1 postgres postgres  5711 Aug  1 08:40 pg_hba.conf
+-rw-------  1 postgres postgres  2640 Aug  1 08:40 pg_ident.conf
+drwx------  4 postgres postgres  4096 Aug  1 08:40 pg_logical
+drwx------  4 postgres postgres  4096 Aug  1 08:40 pg_multixact
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_notify
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_replslot
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_serial
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_snapshots
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_stat
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_stat_tmp
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_subtrans
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_tblspc
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_twophase
+-rw-------  1 postgres postgres     3 Aug  1 08:40 PG_VERSION
+drwx------  3 postgres postgres  4096 Aug  1 08:40 pg_wal
+drwx------  2 postgres postgres  4096 Aug  1 08:40 pg_xact
+-rw-------  1 postgres postgres    88 Aug  1 08:40 postgresql.auto.conf
+-rw-------  1 postgres postgres 29762 Aug  1 08:40 postgresql.conf
+postgres@60b0b099faf9:~$
+
+# pg_setup_hba_conf
 
 
 
